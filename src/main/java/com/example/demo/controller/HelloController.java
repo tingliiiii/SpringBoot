@@ -14,6 +14,7 @@ public class HelloController {
 
 	@GetMapping
 	public String hello(Model model) {
+		
 		// 將要給 jsp 渲染的資料放在 model 中
 		model.addAttribute("name", "tingli");
 		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss E");

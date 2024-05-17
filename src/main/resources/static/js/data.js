@@ -9,6 +9,7 @@ const renderShipTable = (ships) => {
                                     <td>${ship.length}</td>
                                     <td>${ship.width}</td>
                                     </tr>`).join('');
+                                    // join('') 將陣列用空白字串連結，產生一個超長字串
 	const table = `<table class="table table-hover"><thead><tr>
                  <th>名稱</th><th>種類</th><th>長度</th><th>寬度</th>
                  </tr></thead><tbody>${rows}</tbody></table>`;
@@ -35,6 +36,14 @@ document.addEventListener("DOMContentLoaded", async () => {
 		console.log(state, message, data);
 		$('result').innerHTML = data;
 	});
+	
+	$('lottosBtn').addEventListener("click", async (event) => {
+		console.log('lottosBtn被點擊');
+		const response = await fetch('http://localhost:8081/data/lottos');
+		const { state, message, data } = await response.json();
+		console.log(state, message, data);
+		$('result').innerHTML = data.map(int => int).join(' ／ ');
+	});
 
 	$('shipBtn').addEventListener("click", async (event) => {
 		console.log('shipBtn被點擊');
@@ -49,7 +58,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 	$('shipByIdBtn').addEventListener("click", async (event) => {
 		console.log('shipByIdBtn被點擊');
-		const id = parseInt(window.prompt('請輸入id'));
+		const id = window.prompt('請輸入id');
 		const response = await fetch(`http://localhost:8081/data/ship/${id}`);
 		const { state, message, data } = await response.json();
 		console.log(state, message, data);
@@ -73,14 +82,14 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 	$('bmiBtn').addEventListener("click", async (event) => {
 		console.log('bmiBtn被點擊');
-		const h = window.prompt('請輸入身高');
-		const w = window.prompt('請輸入體重');
+		const h = window.prompt('請輸入身高（cm）');
+		const w = window.prompt('請輸入體重（kg）');
 		const response = await fetch(`http://localhost:8081/data/bmi?h=${h}&w=${w}`);
 		const { state, message, data } = await response.json();
 		if (state) {
-			$('result').innerHTML = `身高: ${data.height}<br>
-                               體重: ${data.weight}<br>
-                               BMI: ${data.bmi}<br>
+			$('result').innerHTML = `身高： ${data.height} 公分<br>
+                               體重： ${data.weight} 公斤<br>
+                               BMI： ${data.bmi}<br>
                                ${data.result}`;
 		} else {
 			$('result').innerHTML = message;

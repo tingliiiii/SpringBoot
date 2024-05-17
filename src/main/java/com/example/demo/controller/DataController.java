@@ -1,23 +1,23 @@
 package com.example.demo.controller;
 
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.IntStream;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.example.demo.model.dto.Bmi;
 import com.example.demo.model.po.Ship;
 import com.example.demo.model.response.ApiResponse;
 
-import jakarta.websocket.server.PathParam;
-
-import org.springframework.web.bind.annotation.RequestParam;
 
 @RestController
 @RequestMapping("/data")
@@ -40,7 +40,17 @@ public class DataController {
 		ApiResponse<Integer> apiResponse = new ApiResponse<>(true, "success", data);
 		return ResponseEntity.ok(apiResponse);
 	}
+	
+	// 取得五個隨機數字
+	@GetMapping("/lottos")
+	public ResponseEntity<ApiResponse<Integer[]>> lottos() {
+		Integer[] lottos = IntStream.generate(()->new Random().nextInt(100))
+									.limit(5).boxed().toArray(Integer[]::new);
+		ApiResponse<Integer[]> apiResponse = new ApiResponse<>(true, "success", lottos);
+		return ResponseEntity.ok(apiResponse);
+	}
 
+	// 取得船隻資料
 	@GetMapping("/ship")
 	public ResponseEntity<ApiResponse<Ship>> getship() {
 		Ship ship = new Ship("Titanic", "郵輪", 280, 30);
@@ -48,10 +58,14 @@ public class DataController {
 		return ResponseEntity.ok(apiResponse);
 	}
 
+	// 根據 id 取得船隻資料
 	@GetMapping("/ship/{id}")
 	public ResponseEntity<ApiResponse<Ship>> getshipById(@PathVariable("id") Integer id) {
-		List<Ship> ships = List.of(new Ship("Titanic", "郵輪", 280, 30), new Ship("Evergreen", "貨輪", 350, 40),
-				new Ship("Evergreen", "客船", 280, 30), new Ship("順風一號", "客船", 30, 10));
+		List<Ship> ships = List.of(
+				new Ship("Titanic", "郵輪", 280, 30), 
+				new Ship("Evergreen", "貨輪", 350, 40),
+				new Ship("Evergreen", "客船", 280, 30), 
+				new Ship("順風一號", "客船", 30, 10));
 		if (id >= ships.size() || id < 0) {
 			ApiResponse<Ship> apiResponse = new ApiResponse<>(false, "查無資料", null);
 			return ResponseEntity.ok(apiResponse);
@@ -61,10 +75,14 @@ public class DataController {
 		return ResponseEntity.ok(apiResponse);
 	}
 
+	// 取得多筆船隻資料
 	@GetMapping("/ships")
 	public ResponseEntity<ApiResponse<List<Ship>>> getships() {
-		List<Ship> ships = List.of(new Ship("Titanic", "郵輪", 280, 30), new Ship("Evergreen", "貨輪", 350, 40),
-				new Ship("Evergreen", "客船", 280, 30), new Ship("順風一號", "客船", 30, 10));
+		List<Ship> ships = List.of(
+				new Ship("Titanic", "郵輪", 280, 30), 
+				new Ship("Evergreen", "貨輪", 350, 40),
+				new Ship("Evergreen", "客船", 280, 30), 
+				new Ship("順風一號", "客船", 30, 10));
 		ApiResponse<List<Ship>> apiResponse = new ApiResponse<>(true, "success", ships);
 		return ResponseEntity.ok(apiResponse);
 	}
@@ -78,6 +96,8 @@ public class DataController {
 	@GetMapping("/bmi")
 	public ResponseEntity<ApiResponse<Bmi>> bmi(@RequestParam("h") Double h, @RequestParam("w") Double w) {
 		Double bmiDouble = w / Math.pow(h / 100, 2);
+		DecimalFormat df = new DecimalFormat("#.00");
+		bmiDouble = Double.parseDouble(df.format(bmiDouble));
 		String result = bmiDouble <= 18 ? "過輕" : bmiDouble > 23 ? "過重" : "正常";
 		Bmi bmi = new Bmi(h, w, bmiDouble, result);
 		ApiResponse<Bmi> apiResponse = new ApiResponse<>(true, "success", bmi);
